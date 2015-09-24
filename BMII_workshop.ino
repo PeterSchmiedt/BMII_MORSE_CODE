@@ -12,6 +12,7 @@ LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Set the LCD I
 #define PAUSE_INTERVAL 2
 #define PAUSE_MUL 3
 #define DEBOUNCE_DELAY 50
+#define MORSE_NO 36
 
 int buttonState = 1;
 int lastButtonState = 1;
@@ -25,6 +26,45 @@ int currentBlinkTime = 0;
 int previousBlinkTime = 0;
 int blinkCount = 0;
 int lastDebounceTime = 0;
+
+char alphabet[MORSE_NO] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+String morse[MORSE_NO] = {
+".-",
+"-...",
+"-.-.",
+"-..",
+".",
+"..-.",
+"--.",
+"....",
+"..",
+".---",
+"-.-",
+".-..",
+"--",
+"-.",
+"---",
+".--.",
+"--.-",
+".-.",
+"...",
+"-",
+"..-",
+"...-",
+".--",
+"-..-",
+"-.--",
+"--..",
+"-----",
+".----",
+"..---",
+"...--",
+"....-",
+".....",
+"-....",
+"--...",
+"---..",
+"----."};
 
 String sb = "";
 
@@ -131,14 +171,25 @@ void blinkLedService() {
 
       blinkCount++;
       if (blinkCount == 1) {
-        lcd.print(sb);
+
+        //lcd.print(sb);
+        printLetter();//-------------------------------------------
         sb = "";
-        lcd.write("/");
+        
       } else if (blinkCount == 2) {
         lcd.write(" ");
       }
 
       registerBlink = false;
+    }
+  }
+}
+
+void printLetter() {
+  
+  for (int i=0; i <= MORSE_NO; i++){
+    if (sb == morse[i]) {
+      lcd.write(alphabet[i]);
     }
   }
 }
