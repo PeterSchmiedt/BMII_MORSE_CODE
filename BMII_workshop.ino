@@ -14,7 +14,8 @@ LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Set the LCD I
 #define DEBOUNCE_DELAY 50
 
 int buttonState = 1;
-int buttonStatePrevious = 1;
+int lastButtonState = 1;
+int reading = 1;
 int pauseTime = 0;
 int currentPauseTime = 0;
 int buttonTime = 0;
@@ -65,16 +66,19 @@ void loop() {
 
   blinkLedService();
 
-  buttonStatePrevious = buttonState;
-  buttonState = digitalRead(BUTTON);
+  lastButtonState = reading;
+  reading = digitalRead(BUTTON);
 
-
-  if (buttonState != buttonStatePrevious) {
+  if (reading != lastButtonState) {
     lastDebounceTime = millis();
-    //ak nastane zmena stavu
-    
-    if ((millis() - lastDebounceTime) > DEBOUNCE_DELAY) {
+  }
 
+
+  if ((millis() - lastDebounceTime) > DEBOUNCE_DELAY) {
+
+    if (reading != buttonState) {
+      buttonState = reading;
+      //ak nastane zmena stavu
       if (buttonState == 0) {
         //pressed
         //start counting pressed
@@ -94,29 +98,23 @@ void loop() {
           //lcd.write("-");
           sb += '-';
         }
-
       }
-    }
-
-  } else {
-    if (buttonState == 0) {
-      //pressed
     } else {
-      //released
-      currentPauseTime = millis();
-      if ((currentPauseTime - pauseTime) > PAUSE_TIME - PAUSE_INTERVAL && (currentPauseTime - pauseTime) < PAUSE_TIME + PAUSE_INTERVAL) {
-        //letter delimiter
-        blinkLed();
-      } else if ((currentPauseTime - pauseTime) > PAUSE_MUL * PAUSE_TIME - PAUSE_INTERVAL && (currentPauseTime - pauseTime) < PAUSE_MUL * PAUSE_TIME + PAUSE_INTERVAL) {
-        //word delimiter
-        blinkLed();
+      if (buttonState == 0) {
+        //pressed
+      } else {
+        //released
+        currentPauseTime = millis();
+        if ((currentPauseTime - pauseTime) > PAUSE_TIME - PAUSE_INTERVAL && (currentPauseTime - pauseTime) < PAUSE_TIME + PAUSE_INTERVAL) {
+          //letter delimiter
+          blinkLed();
+        } else if ((currentPauseTime - pauseTime) > PAUSE_MUL * PAUSE_TIME - PAUSE_INTERVAL && (currentPauseTime - pauseTime) < PAUSE_MUL * PAUSE_TIME + PAUSE_INTERVAL) {
+          //word delimiter
+          blinkLed();
+        }
       }
     }
-
-
   }
-
-
 }
 
 void blinkLed() {
