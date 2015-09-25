@@ -26,45 +26,48 @@ int currentBlinkTime = 0;
 int previousBlinkTime = 0;
 int blinkCount = 0;
 int lastDebounceTime = 0;
+int displayCharPos = 0;
+int displayLinePos = 0;
 
 char alphabet[MORSE_NO] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 String morse[MORSE_NO] = {
-".-",
-"-...",
-"-.-.",
-"-..",
-".",
-"..-.",
-"--.",
-"....",
-"..",
-".---",
-"-.-",
-".-..",
-"--",
-"-.",
-"---",
-".--.",
-"--.-",
-".-.",
-"...",
-"-",
-"..-",
-"...-",
-".--",
-"-..-",
-"-.--",
-"--..",
-"-----",
-".----",
-"..---",
-"...--",
-"....-",
-".....",
-"-....",
-"--...",
-"---..",
-"----."};
+  ".-",
+  "-...",
+  "-.-.",
+  "-..",
+  ".",
+  "..-.",
+  "--.",
+  "....",
+  "..",
+  ".---",
+  "-.-",
+  ".-..",
+  "--",
+  "-.",
+  "---",
+  ".--.",
+  "--.-",
+  ".-.",
+  "...",
+  "-",
+  "..-",
+  "...-",
+  ".--",
+  "-..-",
+  "-.--",
+  "--..",
+  "-----",
+  ".----",
+  "..---",
+  "...--",
+  "....-",
+  ".....",
+  "-....",
+  "--...",
+  "---..",
+  "----."
+};
 
 String sb = "";
 
@@ -175,9 +178,11 @@ void blinkLedService() {
         //lcd.print(sb);
         printLetter();//-------------------------------------------
         sb = "";
-        
+
       } else if (blinkCount == 2) {
         lcd.write(" ");
+        displayCharPos++;
+        checkDisplay();
       }
 
       registerBlink = false;
@@ -186,15 +191,26 @@ void blinkLedService() {
 }
 
 void printLetter() {
-  
-  for (int i=0; i <= MORSE_NO; i++){
+
+  for (int i = 0; i <= MORSE_NO; i++) {
     if (sb == morse[i]) {
       lcd.write(alphabet[i]);
+      displayCharPos++;
+      checkDisplay();
     }
   }
 }
 
-
+void checkDisplay() {
+  if(displayCharPos >= 16) {
+    displayCharPos = 0;
+    displayLinePos++;
+    displayLinePos %= 2;
+    lcd.setCursor(displayCharPos, displayLinePos);
+    lcd.write("                ");
+    lcd.setCursor(displayCharPos, displayLinePos);
+  }
+}
 
 
 
